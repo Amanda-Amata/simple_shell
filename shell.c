@@ -29,9 +29,9 @@ void print_failure(char arg[], char argv[])
 void execute_prompt(const char *cmd, char *argv)
 {
 	pid_t process_id = fork();
+	char *token = strtok((char *)cmd, " ");
 	char *args[MAX_ARGS / 2 + 1];
 	int count = 0;
-	char *token = strtok((char *)cmd, " ");
 
 	if (strcmp(cmd, "exit") == 0)
 		exit(EXIT_SUCCESS);
@@ -49,6 +49,7 @@ void execute_prompt(const char *cmd, char *argv)
 		token = strtok(NULL, " ");
 	}
 	args[count] = NULL;
+
 	if (process_id == 0)
 	{
 		while (token != NULL && count < MAX_COMMAND_LENGTH / 2)
@@ -61,11 +62,13 @@ void execute_prompt(const char *cmd, char *argv)
 		if (execve(args[0], args, NULL) == -1)
 		{
 			print_failure(args[0], argv);
-			exit(EXIT_FAILURE);
+			 exit(EXIT_FAILURE);
 		}
 	}
 	else
+	{
 		wait(NULL);
+	}
 }
 
 /**
@@ -83,5 +86,3 @@ void read_cmd(char *cmd, size_t size)
 	}
 	cmd[strcspn(cmd, "\n")] = '\0';
 }
-
-

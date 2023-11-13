@@ -20,8 +20,14 @@ int main(int arg, char *argv[])
 	while (1)
 	{
 		show_prompt();
-		execute_prompt(cmd, argv[0]);
 		read_cmd(cmd, sizeof(cmd));
+		execute_prompt(cmd, argv[0]);
+		fgets(cmd, sizeof(cmd), stdin);
+		cmd[strcspn(cmd, "\n")] = '\0';
+		if (strcmp(cmd, "env") == 0)
+		{
+			env();
+		}
 	}
 	return (0);
 }

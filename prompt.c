@@ -7,5 +7,5 @@
 
 void show_prompt(void)
 {
-	printf("Simple_Shell$");
+	printf("Simple_Shell$ ");
 }

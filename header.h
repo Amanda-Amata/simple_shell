@@ -8,15 +8,69 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <errno.h>
+#include <dirent.h>
+#include <signal.h>
 
-#define MAX_ARGS 64
-#define MAX_COMMAND_LENGTH 140
+#define EXTERNAL_COMMAND 1
+#define INTERNAL_COMMAND 2
+#define PATH_COMMAND 3
+#define INVALID_COMMAND -1
+#define min(x, y) (((x) < (y)) ? (x) : (y))
 
-void show_prompt(void);
-void execute_prompt(const char *cmd, char *argv);
-void read_cmd(char *cmd, size_t size);
-void print_failure(char arg[], char argv[]);
+/**
+ *struct find - a struct that maps a command name to a function
+ *
+ *@cmd_name: name of the command
+ *@func: the function that executes the command
+ */
+
+typedef struct find
+{
+	char *cmd_name;
+	void (*func)(char **command);
+} function_find;
+
 extern char **environ;
-void env(void);
+extern char *line;
+extern char **commands;
+extern char *shell_name;
+extern int status;
+
+/*buddies*/
+void print(char *, int);
+char **tokenizer(char *, char *);
+void remove_newline(char *);
+int _strlen(char *);
+void _strcpy(char *, char *);
+
+/*buddies2*/
+int _strcmp(char *, char *);
+char *_strcat(char *, char *);
+int _strspn(char *, char *);
+int _strcspn(char *, char *);
+char *_strchr(char *, char);
+
+/*buddies3*/
+char *_strtok_r(char *, char *, char **);
+int _atoi(char *);
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+void ctrl_c_handler(int);
+void remove_comment(char *);
+
+/*utils*/
+int parse_command(char *);
+void execute_command(char **, int);
+char *check_path(char *);
+void (*get_func(char *))(char **);
+char *_getenv(char *);
+
+/*built_in*/
+void env(char **);
+void quit(char **);
+
+/*main*/
+extern void non_interactive(void);
+extern void initializer(char **current_command, int type_command);
 
 #endif

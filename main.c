@@ -1,33 +1,56 @@
 #include "header.h"
 
-void execute_prompt(const char *cmd, char *argv);
-void read_cmd(char *cmd, size_t size);
+	char **commands = NULL;
+	char *line = NULL;
+	char *shell_name = NULL;
+	int status = 0;
 
 /**
  * main - entry point
- * @arg: process value
- * @argv: process status
- * Return: always 0
+ * @argc: arguments passed
+ * @argv: arguments to be parsed
+ * Return: 0 on success
  */
 
-int main(int arg, char *argv[])
+
+int main(int argc __attribute__((unused)), char **argv)
 {
-	char cmd[140];
+	char **current_cmd = NULL;
+	int i, type_cmd = 0;
+	size_t n = 0;
 
-	if (arg == 0)
-		return (0);
-
+	signal(SIGINT, ctrl_c_handler);
+	shell_name = argv[0];
 	while (1)
 	{
-		show_prompt();
-		read_cmd(cmd, sizeof(cmd));
-		execute_prompt(cmd, argv[0]);
-		fgets(cmd, sizeof(cmd), stdin);
-		cmd[strcspn(cmd, "\n")] = '\0';
-		if (strcmp(cmd, "env") == 0)
+		non_interactive();
+		print(" Simple_shell$ ", STDOUT_FILENO);
+		if (getline(&line, &n, stdin) == -1)
 		{
-			env();
+			free(line);
+			exit(status);
 		}
+			remove_newline(line);
+			remove_comment(line);
+			commands = tokenizer(line, ";");
+
+		for (i = 0; commands[i] != NULL; i++)
+		{
+			current_cmd = tokenizer(commands[i], " ");
+			if (current_cmd[0] == NULL)
+			{
+				free(current_cmd);
+				break;
+			}
+			type_cmd = parse_command(current_cmd[0]);
+
+			/* initializer -   */
+			initializer(current_cmd, type_cmd);
+			free(current_cmd);
+		}
+		free(commands);
 	}
-	return (0);
+	free(line);
+
+	return (status);
 }
